@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Dashboard - การประปาภูมิภาค</title>
+    <meta name="description" content="Dashboard สำหรับการวางแผนและติดตามข้อมูลการฝึกอบรมของการประปาภูมิภาค ปี 2569">
+    <meta name="keywords" content="การประปาภูมิภาค, ฝึกอบรม, dashboard, training">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+            backdrop-filter: blur(20px);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+        
+        p {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .dashboard-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+            margin: 0 10px 10px 0;
+        }
+        
+        .dashboard-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.4);
+        }
+        
+        .dashboard-link.secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            box-shadow: 0 5px 15px rgba(149, 165, 166, 0.3);
+        }
+        
+        .dashboard-link.secondary:hover {
+            box-shadow: 0 10px 25px rgba(149, 165, 166, 0.4);
+        }
+        
+        .features {
+            margin-top: 40px;
+            text-align: left;
+        }
+        
+        .feature-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px 15px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Training Dashboard</h1>
+        <p>ระบบติดตามการวางแผนฝึกอบรม<br>การประปาภูมิภาค ปี 2569</p>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-number">159</span>
+                <div class="stat-label">หลักสูตร</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">9,754</span>
+                <div class="stat-label">ผู้เข้าอบรม</div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">74.29M</span>
+                <div class="stat-label">งบประมาณ</div>
+            </div>
+        </div>
+        
+        <div style="margin: 30px 0;">
+            <a href="training-dashboard.html" class="dashboard-link">
+                🚀 Dashboard แบบ Interactive
+            </a>
+            <a href="project-overview.html" class="dashboard-link secondary">
+                📋 รายงานโครงการ
+            </a>
+        </div>
+        
+        <div class="features">
+            <div class="feature-item">📈 แสดงสถิติการฝึกอบรมแบบ Real-time</div>
+            <div class="feature-item">🔍 ระบบกรองและค้นหาข้อมูล</div>
+            <div class="feature-item">📱 Responsive Design รองรับทุกอุปกรณ์</div>
+            <div class="feature-item">🎨 UI/UX ที่สวยงามและใช้งานง่าย</div>
+            <div class="feature-item">📊 จัดกลุ่มตามโครงการหลัก/โครงการย่อย</div>
+            <div class="feature-item">🔄 Modal แสดงรายละเอียดแบบเต็มหน้าจอ</div>
+        </div>
+    </div>
+</body>
+</html>

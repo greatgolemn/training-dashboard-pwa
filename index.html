@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แผนการฝึกอบรม กปภ. - Interactive Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #3498db;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .filters {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .filter-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-item label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .filter-item select, .filter-item input {
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .filter-item select:focus, .filter-item input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            height: fit-content;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .project-card.has-courses {
+            border-color: rgba(52, 152, 219, 0.2);
+            cursor: pointer;
+        }
+
+        .project-card.has-courses:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            border-color: rgba(52, 152, 219, 0.4);
+        }
+
+        .project-card.no-courses {
+            border-color: rgba(189, 195, 199, 0.3);
+            opacity: 0.7;
+        }
+
+        .project-card.expanded {
+            border-color: #3498db;
+        }
+
+        .project-card-header {
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .project-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .project-icon {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .project-details {
+            flex: 1;
+        }
+
+        .project-number {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .project-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            line-height: 1.3;
+        }
+
+        .project-summary {
+            text-align: right;
+        }
+
+        .stats-mini {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .stat-mini {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        .expand-button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .expand-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .no-courses-badge {
+            background: #bdc3c7;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .project-expanded-content {
+            border-top: 1px solid #ecf0f1;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 1000px;
+            }
+        }
+
+        .project-stats-detail {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.05), rgba(155, 89, 182, 0.05));
+        }
+
+        .stat-detail-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .stat-detail-item .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-detail-item .stat-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+
+        .sub-project-section {
+            margin-bottom: 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .sub-project-section:last-child {
+            border-bottom: none;
+        }
+
+        .sub-project-title {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
+            padding: 15px 25px;
+            margin: 0;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .courses-list {
+            padding: 0;
+        }
+
+        .course-item {
+            padding: 20px 25px;
+            border-bottom: 1px solid #ecf0f1;
+            transition: all 0.2s ease;
+        }
+
+        .course-item:last-child {
+            border-bottom: none;
+        }
+
+        .course-item:hover {
+            background: #f8f9fa;
+        }
+
+        .course-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .course-name {
+            font-weight: 600;
+            color: #2c3e50;
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .course-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .course-type-badge {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .quarter-badge-small {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .course-item-details {
+            margin-top: 10px;
+        }
+
+        .detail-row {
+            margin-bottom: 10px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .detail-text {
+            color: #2c3e50;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .course-item-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .course-item-stats span {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal.show {
+            opacity: 1;
+        }
+
+        .modal-content-wrapper {
+            width: 95%;
+            max-width: 1400px;
+            max-height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal.show .modal-content-wrapper {
+            transform: scale(1);
+        }
+
+        .modal-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            max-height: 100%;
+            min-height: 0;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .modal-project-info {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .modal-project-icon {
+            font-size: 3rem;
+            background: rgba(255, 255, 255, 0.2);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .modal-project-details {
+            flex: 1;
+        }
+
+        .modal-project-number {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .modal-project-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.05), rgba(155, 89, 182, 0.05));
+            flex-shrink: 0;
+        }
+
+        .modal-stat-item {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-stat-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .modal-stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modal-stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 30px;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            /* Custom scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(52, 152, 219, 0.5) transparent;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: rgba(52, 152, 219, 0.5);
+            border-radius: 4px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(52, 152, 219, 0.7);
+        }
+
+        /* Scroll indicator */
+        .modal-body.has-more-content::after {
+            content: '';
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(to top, rgba(255,255,255,0.9) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .modal-body.has-more-content::before {
+            content: '⏬ เลื่อนลงเพื่อดูเพิ่มเติม';
+            position: sticky;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(52, 152, 219, 0.9);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            text-align: center;
+            animation: bounceY 2s infinite;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        @keyframes bounceY {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-5px); }
+            60% { transform: translateX(-50%) translateY(-3px); }
+        }
+
+        .modal-sub-project {
+            margin-bottom: 40px;
+        }
+
+        .modal-sub-project-title {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 20px 25px;
+            margin: 0 0 25px 0;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+        }
+
+        .modal-courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .modal-course-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+            transition: all 0.3s ease;
+        }
+
+        .modal-course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .modal-course-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-course-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .modal-course-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .modal-course-type {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .modal-quarter {
+            background: #e74c3c;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .modal-course-details {
+            margin-top: 15px;
+        }
+
+        .modal-detail-row {
+            margin-bottom: 12px;
+        }
+
+        .modal-detail-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .modal-detail-value {
+            color: #2c3e50;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .modal-course-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .modal-stat-mini {
+            text-align: center;
+            background: rgba(52, 152, 219, 0.1);
+            padding: 12px 8px;
+            border-radius: 10px;
+        }
+
+        .modal-stat-mini-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            display: block;
+        }
+
+        .modal-stat-mini-label {
+            font-size: 0.7rem;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .course-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .course-type {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .course-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .detail-group {
+            background: rgba(52, 152, 219, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #3498db;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .course-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1));
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-item .number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            display: block;
+        }
+
+        .stat-item .label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .quarter-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .no-results h3 {
+            color: #7f8c8d;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .no-results p {
+            color: #bdc3c7;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .filter-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-card-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .project-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .project-icon {
+                align-self: center;
+            }
+
+            .project-summary {
+                text-align: center;
+            }
+
+            .stats-mini {
+                align-items: center;
+            }
+
+            .project-stats-detail {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .course-item-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .course-badges {
+                justify-content: flex-start;
+            }
+
+            .course-item-stats {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .expand-button {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+
+            /* Modal responsive styles */
+            .modal-content-wrapper {
+                width: 98%;
+                max-height: 95vh;
+                margin: 10px;
+            }
+
+            .modal-header {
+                padding: 20px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .modal-project-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .modal-project-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+                align-self: center;
+            }
+
+            .modal-project-title {
+                font-size: 1.4rem;
+            }
+
+            .modal-stats {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .modal-stat-item {
+                padding: 15px;
+            }
+
+            .modal-stat-number {
+                font-size: 1.5rem;
+            }
+
+            .modal-body {
+                padding: 20px;
+                /* Enhanced touch scrolling for mobile */
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+
+            .modal-sub-project-title {
+                padding: 15px 20px;
+                font-size: 1.1rem;
+            }
+
+            .modal-courses-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .modal-course-card {
+                padding: 20px;
+            }
+
+            .modal-course-title {
+                font-size: 1.1rem;
+            }
+
+            .modal-course-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .modal-stat-mini {
+                padding: 8px 6px;
+            }
+
+            .modal-stat-mini-number {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .project-stats-detail {
+                grid-template-columns: 1fr;
+            }
+
+            .project-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+
+            .project-title {
+                font-size: 1.1rem;
+            }
+
+            .course-item {
+                padding: 15px 20px;
+            }
+
+            .modal-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-course-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .format-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .format-onsite {
+            background: #e8f5e8;
+            color: #27ae60;
+        }
+
+        .format-hybrid {
+            background: #fff3cd;
+            color: #f39c12;
+        }
+
+        .format-ojt {
+            background: #f8d7da;
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 แผนการฝึกอบรม กปภ. 2569</h1>
+            <p>ระบบติดตามและจัดการหลักสูตรฝึกอบรม</p>
+        </div>
+
+        <div class="stats-overview" id="statsOverview">
+            <!-- สถิติจะถูกสร้างโดย JavaScript -->
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="quarterFilter">ไตรมาส</label>
+                    <select id="quarterFilter">
+                        <option value="">ทุกไตรมาส</option>
+                        <option value="1">ไตรมาส 1</option>
+                        <option value="2">ไตรมาส 2</option>
+                        <option value="3">ไตรมาส 3</option>
+                        <option value="4">ไตรมาส 4</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="typeFilter">ประเภท</label>
+                    <select id="typeFilter">
+                        <option value="">ทุกประเภท</option>
+                        <option value="Core">Core</option>
+                        <option value="QW">QW</option>
+                        <option value="TRN">TRN</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="formatFilter">รูปแบบ</label>
+                    <select id="formatFilter">
+                        <option value="">ทุกรูปแบบ</option>
+                        <option value="onsite">Onsite</option>
+                        <option value="hybrid">Hybrid</option>
+                        <option value="OJT">OJT</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label for="searchFilter">ค้นหา</label>
+                    <input type="text" id="searchFilter" placeholder="ค้นหาหลักสูตร...">
+                </div>
+                <div class="filter-item">
+                    <button class="reset-btn" onclick="resetFilters()">รีเซ็ต</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            🔄 กำลังโหลดข้อมูล...
+        </div>
+
+        <div class="courses-grid" id="coursesGrid">
+            <!-- หลักสูตรจะถูกสร้างโดย JavaScript -->
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <h3>😕 ไม่พบหลักสูตรที่ตรงกับเงื่อนไข</h3>
+            <p>ลองปรับเปลี่ยนตัวกรองหรือคำค้นหา</p>
+        </div>
+    </div>
+
+    <!-- Modal สำหรับแสดงรายละเอียดโครงการ -->
+    <div id="projectModal" class="modal" onclick="clickOutside(event)">
+        <div class="modal-content-wrapper">
+            <div class="modal-content" id="modalContent">
+                <!-- เนื้อหาจะถูกสร้างโดย JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลหลักสูตร
+        const coursesData = [
+            {
+                "โครงการหลัก": "1. การพัฒนาคณะกรรมการและผู้บริหาร",
+                "โครงการย่อย": "1.3. การพัฒนาผู้บริหารระดับกลาง",
+                "ประเภท": "QW",
+                "หลักสูตร/โครงการ": "AI เพื่อการบริหารองค์กรยุคใหม่",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "ผจก. ผช.ผจก. / ผอ.กอง",
+                "ไตรมาส": 1,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 63,
+                "ค่าดำเนินการ": 250000,
+                "ค่าเดินทาง": 300000,
+                "รวม คชจ.": 550000
+            },
+            {
+                "โครงการหลัก": "1. การพัฒนาคณะกรรมการและผู้บริหาร",
+                "โครงการย่อย": "1.3. การพัฒนาผู้บริหารระดับกลาง",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "การบริหารผลงานที่เป็นเลิศ และนำพาองค์กรสู่การเปลี่ยนแปลง (Mastering Performance & Navigating Change with Entrepreneurship)",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "ผจก. ผช.ผจก./ผอ.กอง",
+                "ไตรมาส": 3,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 63,
+                "ค่าดำเนินการ": 250000,
+                "ค่าเดินทาง": 300000,
+                "รวม คชจ.": 550000
+            },
+            {
+                "โครงการหลัก": "1. การพัฒนาคณะกรรมการและผู้บริหาร",
+                "โครงการย่อย": "1.4. การพัฒนาผู้บริหารระดับต้น",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "การพัฒนาศักยภาพผู้บริหารระดับต้น",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "หัวหน้างาน ส่วนภูมิภาค กปภ.ข.9-10 ที่มีคุณสมบัติตามเกณฑ์  ดำรงตำแหน่งบริหารไม่น้อยกว่า 5 ปี อายุน้อยกว่าหรือเท่ากับ 55 ปี และยังไม่เคยอบรมหลักสูตร นบป. มาก่อน",
+                "ไตรมาส": 2,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 100,
+                "ค่าดำเนินการ": 250000,
+                "ค่าเดินทาง": 300000,
+                "รวม คชจ.": 550000
+            },
+            {
+                "โครงการหลัก": "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+                "โครงการย่อย": "4.2 การพัฒนาบุคลากรในระบบผลิตน้ำประปาและควบคุมคุณภาพน้ำ",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "ความรู้พื้นฐานด้านงานผลิต",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "hybrid",
+                "กลุ่มเป้าหมาย": "- พนักงานในสังกัดงานผลิต (ที่ไม่เคยผ่านการฝึกอบรมหลักสูตรนี้มาก่อน)\n- ผู้ที่ได้รับมอบหมายให้รับผิดชอบเกี่ยวกับงานผลิต และ/หรือเป็นผู้ที่\nผู้บังคับบัญชาเห็นชอบ",
+                "ไตรมาส": 1,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 3,
+                "จน. คน": 30,
+                "ค่าดำเนินการ": 200000,
+                "ค่าเดินทาง": 200000,
+                "รวม คชจ.": 400000
+            },
+            {
+                "โครงการหลัก": "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+                "โครงการย่อย": "4.2 การพัฒนาบุคลากรในระบบผลิตน้ำประปาและควบคุมคุณภาพน้ำ",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "การควบคุมระบบผลิตน้ำแบบอัตโนมัติ PLC และ IOT",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "- พนักงานในสังกัดงานผลิต/ผู้ที่ได้รับมอบหมายให้รับผิดชอบเกี่ยวกับงานผลิต หรือเป็นผู้ที่ผู้บังคับบัญชาเห็นชอบ (ที่มีอายุงานมากกว่าหรือเท่ากับ 3 ปี ที่ผ่านหลักสูตรการควบคุมระบบผลิตน้ำแบบอัตโนมัตขั้นพื้นฐานแล้ว แต่ยังไม่เคยผ่านการฝึกอบรมหลักสูตรนี้มาก่อน)",
+                "ไตรมาส": 2,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 10,
+                "จน. คน": 30,
+                "ค่าดำเนินการ": 300000,
+                "ค่าเดินทาง": 200000,
+                "รวม คชจ.": 500000
+            },
+            {
+                "โครงการหลัก": "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+                "โครงการย่อย": "4.3 การพัฒนาบุคลากรในระบบการจ่ายน้ำประปาและควบคุมน้ำสูญเสีย",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "การบริหารจัดการและลดน้ำสูญเสีย ระดับต้น (OJT)",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "OJT",
+                "กลุ่มเป้าหมาย": "ช่างโยธา 3-5 ในสังกัดงานบริการ สาขาที่มีอัตราน้ำสูญเสียสูง กปภ.ข.9,10",
+                "ไตรมาส": 2,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 5,
+                "จน. คน": 30,
+                "ค่าดำเนินการ": 200000,
+                "ค่าเดินทาง": 200000,
+                "รวม คชจ.": 400000
+            },
+            {
+                "โครงการหลัก": "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+                "โครงการย่อย": "4.4 ผู้มีส่วนได้ส่วนเสียลูกค้า การตลาดและการบริการ",
+                "ประเภท": "TRN",
+                "หลักสูตร/โครงการ": "หลักสูตรอบรม PWA Ambassador",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "1.PWA Ambassador ประจำ กปภ.สาขา\n2.หัวหน้างานลูกค้าสัมพันธ์ กปภ.ข.9-10",
+                "ไตรมาส": 3,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 50,
+                "ค่าดำเนินการ": 200000,
+                "ค่าเดินทาง": 250000,
+                "รวม คชจ.": 450000
+            },
+            {
+                "โครงการหลัก": "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+                "โครงการย่อย": "4.4 ผู้มีส่วนได้ส่วนเสียลูกค้า การตลาดและการบริการ",
+                "ประเภท": "QW",
+                "หลักสูตร/โครงการ": "การทำแผนธุรกิจและการให้บริการเชิงพื้นที่",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "ผช.ผจก. หนง. หรือ พ. ที่เกี่ยวข้อง ใน กปภ.สาขา",
+                "ไตรมาส": 3,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 3,
+                "จน. คน": 53,
+                "ค่าดำเนินการ": 200000,
+                "ค่าเดินทาง": 100000,
+                "รวม คชจ.": 300000
+            },
+            {
+                "โครงการหลัก": "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+                "โครงการย่อย": "4.4 ผู้มีส่วนได้ส่วนเสียลูกค้า การตลาดและการบริการ",
+                "ประเภท": "TRN",
+                "หลักสูตร/โครงการ": "การใช้งาน Canva และการประยุกต์ใช้ AI ในการนำเสนอ",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "พ.ทุี่รับผิดชอบด้านการจัดทำสื่อประชาสัมพันธ์",
+                "ไตรมาส": 1,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 30,
+                "ค่าดำเนินการ": 150000,
+                "ค่าเดินทาง": 150000,
+                "รวม คชจ.": 300000
+            },
+            {
+                "โครงการหลัก": "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+                "โครงการย่อย": "4.5 การพัฒนาผู้นำและบุคลากรเพื่อการวางแผนเชิงยุทธศาสตร์ การบริหารความเสี่ยงและการควบคุมภายใน เพื่อการพัฒนาอย่างยั่งยืน",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "กฎหมายการจัดซื้อจัดจ้าง",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "พ.ส่วนภูมิภาค ที่เกี่ยวข้อง",
+                "ไตรมาส": 3,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 3,
+                "จน. คน": 53,
+                "ค่าดำเนินการ": 200000,
+                "ค่าเดินทาง": 100000,
+                "รวม คชจ.": 300000
+            },
+            {
+                "โครงการหลัก": "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+                "โครงการย่อย": "4.6 การพัฒนาบุคลากรในกระบวนการจัดซื้อจัดจ้าง การเงิน การจัดเก็บรายได้ และกฎหมาย",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "การตลาดเชิงรุกและการจัดเก็บรายได้อย่างมีประสิทธิภาพ",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "พ.ผู้ปฏิบัติงานด้านการจัดเก็บรายได้ หรืองานอำนวยการ",
+                "ไตรมาส": 2,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 53,
+                "ค่าดำเนินการ": 200000,
+                "ค่าเดินทาง": 250000,
+                "รวม คชจ.": 450000
+            },
+            {
+                "โครงการหลัก": "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+                "โครงการย่อย": "4.7 การพัฒนาบุคลากรในกระบวนการจัดการความรู้ การปรับปรุงคุณภาพงาน และการจัดการนวัตกรรม",
+                "ประเภท": "QW",
+                "หลักสูตร/โครงการ": "การปรับปรุงการทำงานด้วยกิจกรรม KAIZEN",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "หนง.บริการ กปภ.ข.10",
+                "ไตรมาส": 1,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 32,
+                "ค่าดำเนินการ": 200000,
+                "ค่าเดินทาง": 150000,
+                "รวม คชจ.": 350000
+            },
+            {
+                "โครงการหลัก": "6. การพัฒนาบุคลากรด้านกรอบความคิด (Mindset) และคุณภาพชีวิตที่ดี (Well Being)",
+                "โครงการย่อย": "",
+                "ประเภท": "QW",
+                "หลักสูตร/โครงการ": "การพัฒนาศักยภาพนักส่งเสริมสุขภาพใจในองค์กร",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "พ.ที่ผ่านการคัดเลือกจาก กอป.",
+                "ไตรมาส": 3,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 50,
+                "ค่าดำเนินการ": 200000,
+                "ค่าเดินทาง": 250000,
+                "รวม คชจ.": 450000
+            },
+            {
+                "โครงการหลัก": "6. การพัฒนาบุคลากรด้านกรอบความคิด (Mindset) และคุณภาพชีวิตที่ดี (Well Being)",
+                "โครงการย่อย": "",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "ความปลอดภัยในการทำงานเกี่ยวกับสารเคมีอันตรายและการตอบโต้กรณีเกิดเหตุฉุกเฉิน",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "พ.สายงานผลิต เขตละ 2 สาขา",
+                "ไตรมาส": 2,
+                "จน. ครั้ง": 4,
+                "จน. วัน": 1,
+                "จน. คน": 40,
+                "ค่าดำเนินการ": 150000,
+                "ค่าเดินทาง": 50000,
+                "รวม คชจ.": 200000
+            },
+            {
+                "โครงการหลัก": "6. การพัฒนาบุคลากรด้านกรอบความคิด (Mindset) และคุณภาพชีวิตที่ดี (Well Being)",
+                "โครงการย่อย": "",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "ค่าลงทะเบียนฝึกอบรม จป.ทุกระดับ",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "พ. และ ผู้บริหาร ในสังกัด กปภ.ข.9-10",
+                "ไตรมาส": 4,
+                "จน. ครั้ง": 0,
+                "จน. วัน": 0,
+                "จน. คน": 0,
+                "ค่าดำเนินการ": 200000,
+                "ค่าเดินทาง": 0,
+                "รวม คชจ.": 200000
+            },
+            {
+                "โครงการหลัก": "8. โครงการ/กิจกรรมเสริมสร้างคุณธรรมจริยธรรมและธรรมาภิบาล",
+                "โครงการย่อย": "",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "คุณธรรม จริยธรรม และธรรมาภิบาล",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "พ.ทุกระดับ ในสังกัดกปภ.ข.9-10",
+                "ไตรมาส": 1,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 60,
+                "ค่าดำเนินการ": 100000,
+                "ค่าเดินทาง": 300000,
+                "รวม คชจ.": 400000
+            },
+            {
+                "โครงการหลัก": "9. การสนับสนุนของ กปภ. ในโครงการเชิงสังคม (CSR) และการสร้างความสัมพันธ์กับกลุ่มผู้มีส่วนได้เสีย และยกระดับการจัดทำรายงานตามเกณฑ์ Enablers",
+                "โครงการย่อย": "",
+                "ประเภท": "Core",
+                "หลักสูตร/โครงการ": "หลักสูตรสำหรับบุคคลภายนอก",
+                "หน่วยงานผู้จัด": "กฝภ.1",
+                "รูปแบบ": "onsite",
+                "กลุ่มเป้าหมาย": "บุคคลภายนอก",
+                "ไตรมาส": 1,
+                "จน. ครั้ง": 1,
+                "จน. วัน": 2,
+                "จน. คน": 20,
+                "ค่าดำเนินการ": 150000,
+                "ค่าเดินทาง": 0,
+                "รวม คชจ.": 150000
+            }
+        ];
+
+        // ตัวแปรสำหรับเก็บข้อมูลที่กรองแล้ว
+        let filteredCourses = [...coursesData];
+
+        // ฟังก์ชันสำหรับคำนวณสถิติ
+        function calculateStats(courses) {
+            const totalCourses = courses.length;
+            const totalBudget = courses.reduce((sum, course) => sum + course['รวม คชจ.'], 0);
+            const totalParticipants = courses.reduce((sum, course) => sum + course['จน. คน'], 0);
+            const totalDays = courses.reduce((sum, course) => sum + course['จน. วัน'], 0);
+
+            return {
+                totalCourses,
+                totalBudget,
+                totalParticipants,
+                totalDays
+            };
+        }
+
+        // ฟังก์ชันสำหรับแสดงสถิติ
+        function renderStats(stats) {
+            const statsContainer = document.getElementById('statsOverview');
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <span class="stat-number">${stats.totalCourses}</span>
+                    <span class="stat-label">หลักสูตรทั้งหมด</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${stats.totalBudget.toLocaleString()}</span>
+                    <span class="stat-label">งบประมาณรวม (บาท)</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${stats.totalParticipants}</span>
+                    <span class="stat-label">ผู้เข้าอบรมรวม (คน)</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${stats.totalDays}</span>
+                    <span class="stat-label">วันอบรมรวม (วัน)</span>
+                </div>
+            `;
+        }
+
+        // ฟังก์ชันสำหรับสร้าง badge รูปแบบ
+        function getFormatBadge(format) {
+            const formatClass = `format-${format.toLowerCase()}`;
+            const formatText = {
+                'onsite': 'Onsite',
+                'hybrid': 'Hybrid',
+                'OJT': 'OJT'
+            };
+            return `<span class="format-badge ${formatClass}">${formatText[format] || format}</span>`;
+        }
+
+        // ข้อมูลโครงการหลักทั้งหมด
+        const allMainProjects = [
+            "1. การพัฒนาคณะกรรมการและผู้บริหาร",
+            "2. การพัฒนาผู้นำและบุคลากร เพื่อขับเคลื่อนองค์กรด้วยเทคโนโลยีดิจิทัล",
+            "3. การพัฒนาผู้นำและบุคลากร เพื่อเตรียมความพร้อมในการสร้างมูลค่าเพิ่มและสร้างรายได้จากธุรกิจใหม่หรือธุรกิจเกี่ยวเนื่อง",
+            "4. การพัฒนากลุ่มงานตามเส้นทางการเรียนรู้เพื่อการพัฒนาอาชีพทุกกลุ่มงาน (Competency & Career development plan) ตาม IDP",
+            "5. การส่งเสริมวัฒนธรรมและค่านิยมองค์กรที่เสริมสร้างกระบวนการเรียนรู้",
+            "6. การพัฒนาบุคลากรด้านกรอบความคิด (Mindset) และคุณภาพชีวิตที่ดี (Well Being)",
+            "7. การประชุม/สัมนา/ดูงาน ภายใน-ภายนอก",
+            "8. โครงการ/กิจกรรมเสริมสร้างคุณธรรมจริยธรรมและธรรมาภิบาล",
+            "9. การสนับสนุนของ กปภ. ในโครงการเชิงสังคม (CSR) และการสร้างความสัมพันธ์กับกลุ่มผู้มีส่วนได้เสีย และยกระดับการจัดทำรายงานตามเกณฑ์ Enablers",
+            "10. การสนับสนุนทุนการศึกษาของพนักงาน กปภ. ทั้งในประเทศและต่างประเทศ"
+        ];
+
+        // ฟังก์ชันสำหรับจัดกลุ่มหลักสูตรตามโครงการหลัก
+        function groupCoursesByProject(courses) {
+            const grouped = {};
+            
+            // สร้างกลุ่มสำหรับทุกโครงการหลัก
+            allMainProjects.forEach(project => {
+                grouped[project] = {};
+            });
+            
+            // จัดกลุ่มหลักสูตรที่มีอยู่
+            courses.forEach(course => {
+                const mainProject = course['โครงการหลัก'];
+                if (!grouped[mainProject]) {
+                    grouped[mainProject] = {};
+                }
+                
+                const subProject = course['โครงการย่อย'] || 'ไม่มีโครงการย่อย';
+                if (!grouped[mainProject][subProject]) {
+                    grouped[mainProject][subProject] = [];
+                }
+                
+                grouped[mainProject][subProject].push(course);
+            });
+            return grouped;
+        }
+
+        // ฟังก์ชันสำหรับสร้างไอคอนโครงการ
+        function getProjectIcon(projectName) {
+            if (projectName.includes('คณะกรรมการและผู้บริหาร')) return '👥';
+            if (projectName.includes('เทคโนโลยีดิจิทัล')) return '💻';
+            if (projectName.includes('มูลค่าเพิ่ม')) return '📈';
+            if (projectName.includes('IDP')) return '🎯';
+            if (projectName.includes('วัฒนธรรม')) return '🤝';
+            if (projectName.includes('Mindset')) return '🧠';
+            if (projectName.includes('ประชุม')) return '📚';
+            if (projectName.includes('คุณธรรม')) return '⚖️';
+            if (projectName.includes('CSR')) return '🌍';
+            if (projectName.includes('ทุนการศึกษา')) return '🎓';
+            return '📋';
+        }
+
+        // ฟังก์ชันสำหรับคำนวณสถิติโครงการ
+        function getProjectStats(projectCourses) {
+            const courses = Object.values(projectCourses).flat();
+            if (courses.length === 0) return null;
+            
+            return {
+                totalCourses: courses.length,
+                totalBudget: courses.reduce((sum, course) => sum + course['รวม คชจ.'], 0),
+                totalParticipants: courses.reduce((sum, course) => sum + course['จน. คน'], 0),
+                totalDays: courses.reduce((sum, course) => sum + course['จน. วัน'], 0)
+            };
+        }
+
+        // ฟังก์ชันสำหรับสลับการขยายโครงการ
+        function toggleProject(projectIndex) {
+            const modal = document.getElementById('projectModal');
+            const modalContent = document.getElementById('modalContent');
+            const projectData = allMainProjects[projectIndex];
+            const groupedCourses = groupCoursesByProject(filteredCourses);
+            const courses = groupedCourses[projectData] || {};
+            const stats = getProjectStats(courses);
+            
+            if (!stats) return; // ไม่มีหลักสูตร
+            
+            const projectIcon = getProjectIcon(projectData);
+            const projectNumber = projectData.match(/^(\d+)\./) ? projectData.match(/^(\d+)\./)[1] : '';
+            
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <div class="modal-project-info">
+                        <div class="modal-project-icon">${projectIcon}</div>
+                        <div class="modal-project-details">
+                            <div class="modal-project-number">โครงการ ${projectNumber}</div>
+                            <div class="modal-project-title">${projectData.replace(/^\d+\.\s*/, '')}</div>
+                        </div>
+                    </div>
+                    <button class="modal-close" onclick="closeModal()">✕</button>
+                </div>
+                
+                <div class="modal-stats">
+                    <div class="modal-stat-item">
+                        <span class="modal-stat-number">${stats.totalCourses}</span>
+                        <span class="modal-stat-label">หลักสูตรทั้งหมด</span>
+                    </div>
+                    <div class="modal-stat-item">
+                        <span class="modal-stat-number">${stats.totalBudget.toLocaleString()}</span>
+                        <span class="modal-stat-label">งบประมาณรวม (บาท)</span>
+                    </div>
+                    <div class="modal-stat-item">
+                        <span class="modal-stat-number">${stats.totalParticipants}</span>
+                        <span class="modal-stat-label">ผู้เข้าอบรมรวม (คน)</span>
+                    </div>
+                    <div class="modal-stat-item">
+                        <span class="modal-stat-number">${stats.totalDays}</span>
+                        <span class="modal-stat-label">วันอบรมรวม (วัน)</span>
+                    </div>
+                </div>
+                
+                <div class="modal-body" id="modalBodyContent">
+                    ${Object.keys(courses).map(subProject => {
+                        if (subProject === 'ไม่มีโครงการย่อย' || !courses[subProject].length) return '';
+                        
+                        return `
+                            <div class="modal-sub-project">
+                                <h3 class="modal-sub-project-title">${subProject}</h3>
+                                <div class="modal-courses-grid">
+                                    ${courses[subProject].map(course => `
+                                        <div class="modal-course-card">
+                                            <div class="modal-course-header">
+                                                <div class="modal-course-title">${course['หลักสูตร/โครงการ']}</div>
+                                                <div class="modal-course-badges">
+                                                    <span class="modal-course-type">${course['ประเภท']}</span>
+                                                    <span class="modal-quarter">Q${course['ไตรมาส']}</span>
+                                                    ${getFormatBadge(course['รูปแบบ'])}
+                                                </div>
+                                            </div>
+                                            <div class="modal-course-details">
+                                                <div class="modal-detail-row">
+                                                    <span class="modal-detail-label">หน่วยงานผู้จัด:</span>
+                                                    <span class="modal-detail-value">${course['หน่วยงานผู้จัด']}</span>
+                                                </div>
+                                                <div class="modal-detail-row">
+                                                    <span class="modal-detail-label">กลุ่มเป้าหมาย:</span>
+                                                    <span class="modal-detail-value">${course['กลุ่มเป้าหมาย']}</span>
+                                                </div>
+                                                <div class="modal-course-stats">
+                                                    <div class="modal-stat-mini">
+                                                        <span class="modal-stat-mini-number">${course['จน. ครั้ง']}</span>
+                                                        <span class="modal-stat-mini-label">ครั้ง</span>
+                                                    </div>
+                                                    <div class="modal-stat-mini">
+                                                        <span class="modal-stat-mini-number">${course['จน. วัน']}</span>
+                                                        <span class="modal-stat-mini-label">วัน</span>
+                                                    </div>
+                                                    <div class="modal-stat-mini">
+                                                        <span class="modal-stat-mini-number">${course['จน. คน']}</span>
+                                                        <span class="modal-stat-mini-label">คน</span>
+                                                    </div>
+                                                    <div class="modal-stat-mini">
+                                                        <span class="modal-stat-mini-number">${(course['รวม คชจ.'] / 1000).toFixed(0)}k</span>
+                                                        <span class="modal-stat-mini-label">บาท</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                    
+                    ${courses['ไม่มีโครงการย่อย'] && courses['ไม่มีโครงการย่อย'].length > 0 ? `
+                        <div class="modal-sub-project">
+                            <h3 class="modal-sub-project-title">หลักสูตรทั่วไป</h3>
+                            <div class="modal-courses-grid">
+                                ${courses['ไม่มีโครงการย่อย'].map(course => `
+                                    <div class="modal-course-card">
+                                        <div class="modal-course-header">
+                                            <div class="modal-course-title">${course['หลักสูตร/โครงการ']}</div>
+                                            <div class="modal-course-badges">
+                                                <span class="modal-course-type">${course['ประเภท']}</span>
+                                                <span class="modal-quarter">Q${course['ไตรมาส']}</span>
+                                                ${getFormatBadge(course['รูปแบบ'])}
+                                            </div>
+                                        </div>
+                                        <div class="modal-course-details">
+                                            <div class="modal-detail-row">
+                                                <span class="modal-detail-label">หน่วยงานผู้จัด:</span>
+                                                <span class="modal-detail-value">${course['หน่วยงานผู้จัด']}</span>
+                                            </div>
+                                            <div class="modal-detail-row">
+                                                <span class="modal-detail-label">กลุ่มเป้าหมาย:</span>
+                                                <span class="modal-detail-value">${course['กลุ่มเป้าหมาย']}</span>
+                                            </div>
+                                            <div class="modal-course-stats">
+                                                <div class="modal-stat-mini">
+                                                    <span class="modal-stat-mini-number">${course['จน. ครั้ง']}</span>
+                                                    <span class="modal-stat-mini-label">ครั้ง</span>
+                                                </div>
+                                                <div class="modal-stat-mini">
+                                                    <span class="modal-stat-mini-number">${course['จน. วัน']}</span>
+                                                    <span class="modal-stat-mini-label">วัน</span>
+                                                </div>
+                                                <div class="modal-stat-mini">
+                                                    <span class="modal-stat-mini-number">${course['จน. คน']}</span>
+                                                    <span class="modal-stat-mini-label">คน</span>
+                                                </div>
+                                                <div class="modal-stat-mini">
+                                                    <span class="modal-stat-mini-number">${(course['รวม คชจ.'] / 1000).toFixed(0)}k</span>
+                                                    <span class="modal-stat-mini-label">บาท</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+                // เรียกใช้ scroll listeners หลังจาก modal แสดงแล้ว
+                addModalScrollListeners();
+            }, 10);
+        }
+
+        // ฟังก์ชันสำหรับปิด Modal
+        function closeModal() {
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        // ปิด Modal เมื่อคลิกภายนอก
+        function clickOutside(event) {
+            const modal = document.getElementById('projectModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // ฟังก์ชันสำหรับแสดงหลักสูตรแบบการ์ด
+        function renderCourses(courses) {
+            const coursesContainer = document.getElementById('coursesGrid');
+            const noResults = document.getElementById('noResults');
+
+            const groupedCourses = groupCoursesByProject(courses);
+            let html = '';
+
+            allMainProjects.forEach((mainProject, index) => {
+                const projectNumber = mainProject.match(/^(\d+)\./) ? mainProject.match(/^(\d+)\./)[1] : '';
+                const projectIcon = getProjectIcon(mainProject);
+                const projectData = groupedCourses[mainProject] || {};
+                const stats = getProjectStats(projectData);
+                const hasCourses = stats !== null;
+                
+                html += `
+                    <div class="project-card ${hasCourses ? 'has-courses' : 'no-courses'} fade-in" data-project-index="${index}">
+                        <div class="project-card-header" ${hasCourses ? `onclick="toggleProject(${index})"` : ''}>
+                            <div class="project-info">
+                                <div class="project-icon">${projectIcon}</div>
+                                <div class="project-details">
+                                    <div class="project-number">โครงการ ${projectNumber}</div>
+                                    <div class="project-title">${mainProject.replace(/^\d+\.\s*/, '')}</div>
+                                </div>
+                            </div>
+                            <div class="project-summary">
+                                ${hasCourses ? `
+                                    <div class="stats-mini">
+                                        <span class="stat-mini">${stats.totalCourses} หลักสูตร</span>
+                                        <span class="stat-mini">${(stats.totalBudget / 1000000).toFixed(1)}M บาท</span>
+                                    </div>
+                                    <button class="expand-button">📥 ดูรายละเอียด</button>
+                                ` : `
+                                    <div class="no-courses-badge">ยังไม่มีหลักสูตร</div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (html === '') {
+                coursesContainer.innerHTML = '';
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+                coursesContainer.innerHTML = html;
+            }
+        }
+
+        // ฟังก์ชันสำหรับกรองข้อมูล
+        function filterCourses() {
+            const quarterFilter = document.getElementById('quarterFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const formatFilter = document.getElementById('formatFilter').value;
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+
+            filteredCourses = coursesData.filter(course => {
+                const matchQuarter = !quarterFilter || course['ไตรมาส'].toString() === quarterFilter;
+                const matchType = !typeFilter || course['ประเภท'] === typeFilter;
+                const matchFormat = !formatFilter || course['รูปแบบ'] === formatFilter;
+                const matchSearch = !searchFilter || 
+                    course['หลักสูตร/โครงการ'].toLowerCase().includes(searchFilter) ||
+                    course['โครงการหลัก'].toLowerCase().includes(searchFilter) ||
+                    course['โครงการย่อย'].toLowerCase().includes(searchFilter);
+
+                return matchQuarter && matchType && matchFormat && matchSearch;
+            });
+
+            const stats = calculateStats(filteredCourses);
+            renderStats(stats);
+            renderCourses(filteredCourses);
+        }
+
+        // ฟังก์ชันรีเซ็ตตัวกรอง
+        function resetFilters() {
+            document.getElementById('quarterFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('formatFilter').value = '';
+            document.getElementById('searchFilter').value = '';
+            filterCourses();
+        }
+
+        // Event listeners
+        document.getElementById('quarterFilter').addEventListener('change', filterCourses);
+        document.getElementById('typeFilter').addEventListener('change', filterCourses);
+        document.getElementById('formatFilter').addEventListener('change', filterCourses);
+        document.getElementById('searchFilter').addEventListener('input', filterCourses);
+
+        // Keyboard event สำหรับปิด modal ด้วย ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('projectModal');
+                if (modal.style.display === 'flex') {
+                    closeModal();
+                }
+            }
+        });
+
+        // ฟังก์ชันเพิ่มแสดง scroll indicator ใน modal
+        function checkScrollIndicator() {
+            const modalBody = document.getElementById('modalBodyContent');
+            if (modalBody) {
+                const isScrollable = modalBody.scrollHeight > modalBody.clientHeight;
+                const isAtBottom = modalBody.scrollTop + modalBody.clientHeight >= modalBody.scrollHeight - 10;
+                
+                // เพิ่ม class สำหรับ CSS styling ของ scroll indicator
+                if (isScrollable && !isAtBottom) {
+                    modalBody.classList.add('has-more-content');
+                } else {
+                    modalBody.classList.remove('has-more-content');
+                }
+            }
+        }
+
+        // Event listener สำหรับตรวจสอบการ scroll ใน modal
+        function addModalScrollListeners() {
+            const modalBody = document.getElementById('modalBodyContent');
+            if (modalBody) {
+                modalBody.addEventListener('scroll', checkScrollIndicator);
+                // ตรวจสอบครั้งแรกเมื่อ modal เปิด
+                setTimeout(checkScrollIndicator, 100);
+            }
+        }
+
+        // เริ่มต้นการแสดงผล
+        document.addEventListener('DOMContentLoaded', function() {
+            const stats = calculateStats(coursesData);
+            renderStats(stats);
+            renderCourses(coursesData);
+        });
+    </script>
+</body>
+</html>
